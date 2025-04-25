@@ -8,10 +8,15 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements JWTSubject
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    public const ROLE_USER = '3';
+    public const ROLE_ADMIN = '2';
+    public const ROLE_SUPER_ADMIN = '1';
 
     
 
@@ -52,4 +57,15 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function getJWTIdentifier()
+    {
+        return $this->getKey();
+    }
+
+    // Get custom claims for JWT (we are not adding any here for simplicity)
+    public function getJWTCustomClaims()
+    {
+        return [];
+    }
 }
