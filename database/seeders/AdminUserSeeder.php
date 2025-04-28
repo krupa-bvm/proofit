@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class AdminUserSeeder extends Seeder
 {
@@ -13,22 +14,27 @@ class AdminUserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::updateOrCreate(
+        $adminRole = Role::findByName('admin');
+        $superAdminRole = Role::findByName('super_admin');
+
+        // Create admin user and assign role
+        $adminUser = User::updateOrCreate(
             ['email' => 'admin@proofit.com'],
             [
                 'name' => 'Admin User',
                 'password' => bcrypt('admin'),
-                'role' => User::ROLE_ADMIN,
             ]
         );
+        $adminUser->assignRole($adminRole);
 
-        User::updateOrCreate(
+        // Create super admin user and assign role
+        $superAdminUser = User::updateOrCreate(
             ['email' => 'super@proofit.com'],
             [
                 'name' => 'Super Admin',
                 'password' => bcrypt('superAdmin'),
-                'role' => User::ROLE_SUPER_ADMIN,
             ]
         );
+        $superAdminUser->assignRole($superAdminRole);
     }
 }

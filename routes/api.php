@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CertificateController;
@@ -8,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\RolePermissionController;
 use PragmaRX\Google2FALaravel\Support\Authenticator;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -19,10 +19,6 @@ use PragmaRX\Google2FALaravel\Support\Authenticator;
 | be assigned to the "api" middleware group. Make something great!
 |
 */
-
-Route::post('/register', [UserController::class, 'register']);
-Route::post('/login', [UserController::class, 'login']);
-
 
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();
@@ -40,7 +36,8 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('login', [AuthController::class, 'login']);
+Route::post('login', [AuthController::class, 'login'])->name('login');
+Route::post('/register', [UserController::class, 'register']);
 
 Route::middleware('auth:api')->group(function () {
     Route::post('/2fa/setup', [AuthController::class, 'setup']);
@@ -48,7 +45,13 @@ Route::middleware('auth:api')->group(function () {
 });
 
 Route::middleware(['auth:api', '2fa.admin'])->prefix('admin')->group(function () {
-    Route::middleware('role:admin')->get('/admin-data', fn() => response()->json(['data' => 'Admin only data']));
+    Route::middleware('role:admin')->group(function () {
+        Route::get('/certificates', [AdminCertificateController::class, 'index']);
+        Route::get('/certificates/search', [AdminCertificateController::class, 'search']);
+        Route::get('/certificates/{certificate_id}', [AdminCertificateController::class, 'show']);
+        Route::post('/certificates/{certificate_id}/update-status', [AdminCertificateController::class, 'updateStatus']);
+        Route::get('/audit-report', [AdminCertificateController::class, 'downloadReport']);
+    });
 
     Route::middleware('role:super_admin')->group(function () {
         Route::post('/roles', [RolePermissionController::class, 'createRole']);

@@ -18,7 +18,7 @@ class User extends Authenticatable implements JWTSubject
     public const ROLE_ADMIN = '2';
     public const ROLE_SUPER_ADMIN = '1';
 
-    
+
 
     /**
      * The attributes that are mass assignable.
@@ -41,11 +41,13 @@ class User extends Authenticatable implements JWTSubject
         'remember_token',
     ];
 
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
 
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [];
     }
     /**
@@ -57,15 +59,4 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
-    public function getJWTIdentifier()
-    {
-        return $this->getKey();
-    }
-
-    // Get custom claims for JWT (we are not adding any here for simplicity)
-    public function getJWTCustomClaims()
-    {
-        return [];
-    }
 }

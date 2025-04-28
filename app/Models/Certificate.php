@@ -14,4 +14,9 @@ class Certificate extends Model
         'timestamp', 'blockchain_tx', 'project_name',
         'description', 'language', 'preview_url',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
