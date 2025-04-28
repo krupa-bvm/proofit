@@ -28,6 +28,28 @@ class AuthController extends Controller
             return response()->json(['error' => '2FA is required for this user'], 403);
         }
 
+        if (($user->hasRole('admin') || $user->hasRole('super_admin')) && is_null($user->two_factor_confirmed_at)) {
+            return response()->json(['error' => '2FA is required for this user'], 403);
+        }
+
+        if ($user->hasRole('admin') || $user->hasRole('super_admin')) {
+            $ipAddress = Request::ip();
+
+            Log::info('Admin Login', [
+                'user_id' => $user->id,
+                'email' => $user->email,
+                'ip_address' => $ipAddress,
+                'timestamp' => now()
+            ]);
+
+            AdminAuditLog::create([
+                'user_id' => $user->id,
+                'action' => 'login',
+                'ip_address' => $ipAddress,
+                'created_at' => now()
+            ]);
+        }
+
         return response()->json(compact('token', 'user'));
     }
 
@@ -42,7 +64,7 @@ class AuthController extends Controller
         $user->two_factor_secret = $otp;
         // $user->two_factor_expires_at = now()->addMinutes(10);
         $user->save();
-dd($otp);
+        dd($otp);
         // Send OTP as a raw email
         Mail::raw("Your OTP code is: $otp\n\nIt will expire in 10 minutes.", function ($message) use ($user) {
             $message->to($user->email)
@@ -66,7 +88,7 @@ dd($otp);
             // }
 
             $user->two_factor_confirmed_at = now();
-            $user->two_factor_secret = null; 
+            $user->two_factor_secret = null;
             $user->save();
 
             return response()->json(['message' => '2FA verified']);

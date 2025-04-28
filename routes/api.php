@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
+use App\Http\Controllers\superAdmin\userController as superAdminUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CertificateController;
@@ -58,5 +59,11 @@ Route::middleware(['auth:api', '2fa.admin'])->prefix('admin')->group(function ()
         Route::post('/permissions', [RolePermissionController::class, 'createPermission']);
         Route::post('/assign-role', [RolePermissionController::class, 'assignRole']);
         Route::post('/assign-permission', [RolePermissionController::class, 'assignPermission']);
+        Route::get('/show-user-role', [RolePermissionController::class, 'getAllUsersWithRoles']);
+        Route::get('/', [RolePermissionController::class, '']);
+
+        Route::get('/users', [superAdminUserController::class, 'index']);
+        Route::post('/users/{user_id}/ban', [superAdminUserController::class, 'ban']);
+        Route::post('/users/{user_id}/reset-password', [superAdminUserController::class, 'resetPassword']);
     });
 });

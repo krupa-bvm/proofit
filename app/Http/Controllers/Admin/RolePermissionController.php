@@ -11,24 +11,24 @@ use App\Models\User;
 class RolePermissionController extends Controller
 {
     public function createRole(Request $request)
-{
-    // Validate the request with custom error messages
-    $request->validate([
-        'name' => 'required|unique:roles,name|max:255',
-    ], [
-        'name.required' => 'The role name is required.',
-        'name.unique' => 'The role name already exists. Please choose another name.',
-        'name.max' => 'The role name may not be greater than 255 characters.',
-    ]);
+    {
+        // Validate the request with custom error messages
+        $request->validate([
+            'name' => 'required|unique:roles,name|max:255',
+        ], [
+            'name.required' => 'The role name is required.',
+            'name.unique' => 'The role name already exists. Please choose another name.',
+            'name.max' => 'The role name may not be greater than 255 characters.',
+        ]);
 
-    // Create the role if validation passes
-    $role = Role::create(['name' => $request->name]);
+        // Create the role if validation passes
+        $role = Role::create(['name' => $request->name]);
 
-    return response()->json([
-        'message' => 'Role created successfully.',
-        'role' => $role,
-    ]);
-}
+        return response()->json([
+            'message' => 'Role created successfully.',
+            'role' => $role,
+        ]);
+    }
 
 
     public function createPermission(Request $request)
@@ -45,7 +45,7 @@ class RolePermissionController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
         $user = User::find($request->user_id);
-        // dd(vars: $user->assignRole($request->role));
+        dd(vars: $user->assignRole($request->role));
 
         $user->assignRole($request->role);
         return response()->json(['message' => 'Role assigned']);
@@ -61,4 +61,18 @@ class RolePermissionController extends Controller
         $role->givePermissionTo($request->permission);
         return response()->json(['message' => 'Permission assigned to role']);
     }
+    public function getAllUsersWithRoles()
+{
+    $users = User::with('roles')->get(); // Eager load roles to avoid N+1 problem
+
+    $result = $users->map(function ($user) {
+        return [
+            'user_id' => $user->id,
+            'roles' => $user->getRoleNames(), // roles as array of role names
+        ];
+    });
+
+    return response()->json($result);
+}
+
 }
