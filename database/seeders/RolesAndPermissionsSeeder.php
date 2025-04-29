@@ -15,9 +15,8 @@ class RolesAndPermissionsSeeder extends Seeder
     public function run(): void
     {
          // Define roles
-         $admin = Role::create(['name' => 'admin']);
-         $superAdmin = Role::create(['name' => 'super_admin']);
- 
+         $admin = Role::create(['name' => 'admin', 'guard_name' => 'api']);
+         $superAdmin = Role::create(['name' => 'super_admin', 'guard_name' => 'api']); 
          // Define permissions
          $permissions = [
              'view uploads',

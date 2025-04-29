@@ -45,7 +45,7 @@ class RolePermissionController extends Controller
             'role' => 'required|exists:roles,name',
         ]);
         $user = User::find($request->user_id);
-        dd(vars: $user->assignRole($request->role));
+        // dd(vars: $user->assignRole($request->role));
 
         $user->assignRole($request->role);
         return response()->json(['message' => 'Role assigned']);

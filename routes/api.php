@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\CertificateController as AdminCertificateController;
+use App\Http\Controllers\Admin\AuditLogController;
 use App\Http\Controllers\superAdmin\userController as superAdminUserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -52,6 +53,11 @@ Route::middleware(['auth:api', '2fa.admin'])->prefix('admin')->group(function ()
         Route::get('/certificates/{certificate_id}', [AdminCertificateController::class, 'show']);
         Route::post('/certificates/{certificate_id}/update-status', [AdminCertificateController::class, 'updateStatus']);
         Route::get('/audit-report', [AdminCertificateController::class, 'downloadReport']);
+
+        Route::get('/audit-logs', [AuditLogController::class, 'index']);
+        Route::get('/audit-logs/{id}', [AuditLogController::class, 'show']);
+        Route::delete('/audit-logs/clear', [AuditLogController::class, 'clear']);
+    
     });
 
     Route::middleware('role:super_admin')->group(function () {
